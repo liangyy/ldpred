@@ -6,7 +6,7 @@ Various useful LD functions.
 try: 
     import scipy as sp
 except Exception:
-    print('Using Numpy instead of Scipy.')
+    print 'Using Numpy instead of Scipy.'
     import numpy as sp
     
 import sys
@@ -22,7 +22,7 @@ def get_LDpred_ld_tables(snps, ld_radius=100, ld_window_size=0, h2=None, n_train
     
     ld_dict = {}
     m, n = snps.shape
-    print(m, n)
+    print m, n
     ld_scores = sp.ones(m)
     ret_dict = {}
     if gm_ld_radius is None:
@@ -72,7 +72,7 @@ def get_LDpred_ld_tables(snps, ld_radius=100, ld_window_size=0, h2=None, n_train
             ld_scores[snp_i] = lds_i
         
         avg_window_size = sp.mean(window_sizes)
-        print('Average # of SNPs in LD window was %0.2f' % avg_window_size)
+        print 'Average # of SNPs in LD window was %0.2f' % avg_window_size
         if ld_window_size == 0:
             ld_window_size = avg_window_size * 2
         ret_dict['ld_boundaries'] = ld_boundaries
@@ -113,7 +113,7 @@ def calc_ld_table(snps, max_ld_dist=2000, min_r2=0.2, verbose=True, normalize=Fa
 
     
     if verbose:
-        print('Calculating LD table')
+        print 'Calculating LD table'
     t0 = time.time()
     num_snps, num_indivs = snps.shape    
     ld_table = {}
@@ -123,7 +123,7 @@ def calc_ld_table(snps, max_ld_dist=2000, min_r2=0.2, verbose=True, normalize=Fa
     a = min(max_ld_dist, num_snps)
     num_pairs = (a * (num_snps - 1)) - a * (a + 1) * 0.5
     if verbose:
-        print('Correlation between %d pairs will be tested' % num_pairs)
+        print 'Correlation between %d pairs will be tested' % num_pairs
     num_stored = 0
     for i in range(0, num_snps - 1):
         start_i = i + 1
@@ -144,13 +144,13 @@ def calc_ld_table(snps, max_ld_dist=2000, min_r2=0.2, verbose=True, normalize=Fa
     if verbose:
         sys.stdout.write('Done.\n')
         if num_pairs > 0:
-            print('Stored %d (%0.4f%%) correlations that made the cut (r^2>%0.3f).' % (num_stored, 100 * (num_stored / float(num_pairs)), min_r2))
+            print 'Stored %d (%0.4f%%) correlations that made the cut (r^2>%0.3f).' % (num_stored, 100 * (num_stored / float(num_pairs)), min_r2)
         else:
-            print('-')
+            print '-'
     t1 = time.time()
     t = (t1 - t0)
     if verbose:
-        print('\nIt took %d minutes and %0.2f seconds to calculate the LD table' % (t / 60, t % 60))
+        print '\nIt took %d minutes and %0.2f seconds to calculate the LD table' % (t / 60, t % 60)
     del snps
     return ld_table
 
@@ -197,7 +197,7 @@ def ml_LD_shrink(beta_hats, genotypes=None, reference_ld_mats=None, window_metho
     If reference_ld_mats are supplied, it uses those, otherwise it uses the LD in the genotype data.
     """    
     if verbose:
-        print('Doing LD correction')
+        print 'Doing LD correction'
     t0 = time.time()
     num_betas = len(beta_hats)
     updated_betas = sp.empty(num_betas)
@@ -251,7 +251,7 @@ def ml_LD_shrink(beta_hats, genotypes=None, reference_ld_mats=None, window_metho
     t1 = time.time()
     t = (t1 - t0)
     if verbose:
-        print('\nIt took %d minutes and %0.2f seconds to perform the Infinitesimal LD shrink' % (t / 60, t % 60))
+        print '\nIt took %d minutes and %0.2f seconds to perform the Infinitesimal LD shrink' % (t / 60, t % 60)
     return updated_betas
 
 
@@ -273,7 +273,7 @@ def ml_iter(beta_hats, genotypes, ld_radius=20,
     """
 
     if verbose:
-        print('Performing iterative approach')
+        print 'Performing iterative approach'
     
     # Ordering the beta_hats, and storing the order
     m = len(beta_hats)
@@ -287,14 +287,14 @@ def ml_iter(beta_hats, genotypes, ld_radius=20,
     genotypes = sp.array(genotypes)
     assert len(genotypes) == m, 'WTF?'
     if verbose:
-        print('# SNPs: %d' % m)
+        print '# SNPs: %d' % m
 
     max_num_selected = int(m * iter_percentile)
     selected_indices = set()
     updated_beta_hats = beta_hats[:]
     while len(selected_indices) < max_num_selected:
         # Sort and select beta
-        l = list(zip((sp.array(updated_beta_hats) ** 2).tolist(), list(range(m))))
+        l = zip((sp.array(updated_beta_hats) ** 2).tolist(), range(m))
         l.sort(reverse=True)
         for beta_hat, beta_i in l:
             if not beta_i in selected_indices:
@@ -337,14 +337,14 @@ def smart_ld_pruning(scores, ld_table, max_ld=0.5, verbose=False, reverse=False)
     If using betas, set reversed to True.
     """
     if verbose:
-        print('Performing smart LD pruning')
+        print 'Performing smart LD pruning'
     t0 = time.time()
     if type(scores) == type([]):
-        l = list(zip(scores, list(range(len(scores)))))
+        l = zip(scores, range(len(scores)))
     else:
-        l = list(zip(scores.tolist(), list(range(len(scores)))))
+        l = zip(scores.tolist(), range(len(scores)))
     l.sort(reverse=reverse)
-    l = list(map(list, list(zip(*l))))
+    l = map(list, zip(*l))
     rank_order = l[1]
     indices_to_keep = []
     remaining_indices = set(rank_order)
@@ -364,7 +364,7 @@ def smart_ld_pruning(scores, ld_table, max_ld=0.5, verbose=False, reverse=False)
     t1 = time.time()
     t = (t1 - t0)
     if verbose:
-        print('\nIt took %d minutes and %0.2f seconds to LD-prune' % (t / 60, t % 60))
+        print '\nIt took %d minutes and %0.2f seconds to LD-prune' % (t / 60, t % 60)
     return pruning_vector             
 
 
@@ -374,7 +374,7 @@ def ld_pruning(ld_table, max_ld=0.5, verbose=False):
     Prunes SNPs in LD, in random order. 
     """
     if verbose:
-        print('Calculating LD table')
+        print 'Calculating LD table'
     t0 = time.time()
     indices_to_keep = []
     num_snps = len(ld_table)
@@ -395,7 +395,7 @@ def ld_pruning(ld_table, max_ld=0.5, verbose=False):
     t1 = time.time()
     t = (t1 - t0)
     if verbose:
-        print('\nIt took %d minutes and %0.2f seconds to LD-prune' % (t / 60, t % 60))
+        print '\nIt took %d minutes and %0.2f seconds to LD-prune' % (t / 60, t % 60)
     return filter_vector
 
 
