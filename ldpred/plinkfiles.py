@@ -11,7 +11,7 @@ def get_chrom_dict(loci, chromosomes):
     for chrom in chromosomes:
         chr_str = 'chrom_%s' % chrom
         chr_dict[chr_str] = {'sids':[], 'snp_indices':[], 'positions':[], 'nts':[]}
-      
+
     for i, l in enumerate(loci):
         chrom = l.chromosome
         pos = l.bp_position
@@ -21,7 +21,7 @@ def get_chrom_dict(loci, chromosomes):
         chr_dict[chr_str]['snp_indices'].append(i)
         chr_dict[chr_str]['positions'].append(pos)
         chr_dict[chr_str]['nts'].append([l.allele1, l.allele2])
-      
+
     print('Genotype dictionary filled')
     return chr_dict
 
@@ -35,6 +35,7 @@ def parse_plink_snps(genotype_file, snp_indices):
     raw_snps = sp.empty((num_snps, num_individs), dtype='int8')
     # If these indices are not in order then we place them in the right place while parsing SNPs.
     snp_order = sp.argsort(snp_indices)
+    print(snp_indices)
     ordered_snp_indices = list(snp_indices[snp_order])
     ordered_snp_indices.reverse()
     print('Iterating over file to load SNPs')

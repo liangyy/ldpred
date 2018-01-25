@@ -67,6 +67,10 @@ import gzip
 import random
 import plinkfiles
 
+## Newly added
+import numpy as np
+import python3_patch
+
 ambig_nts = set([('A', 'T'), ('T', 'A'), ('G', 'C'), ('C', 'G')])
 # recode_dict = {'1':'A', '2':'C', '3':'G', '4':'T'}
 opp_strand_dict = {'A':'T', 'G':'C', 'T':'A', 'C':'G'}
@@ -183,7 +187,7 @@ def _parse_decode_genotypes_(decode_file, sids, pns, ocg):
     mns = sids[mn_filter]
 
     indices = list(range(len(mns1)))
-    mn_indices_dict = dict((key, value) for (key, value) in it.izip(mns1, indices))
+    mn_indices_dict = dict((key, value) for (key, value) in zip(mns1, indices))
 
     mn_indices = []
     for mn in mns:
@@ -286,7 +290,6 @@ def parse_sum_stats_standard(filename=None,
 #                              'betas':[], 'nts': [], 'sids': [], 'positions': []}
 
 
-
     print(('Parsing the file: %s' % filename))
     with open(filename) as f:
         print((next(f)))
@@ -349,11 +352,11 @@ def parse_sum_stats_standard(filename=None,
                 prev_pos = pos
             ps.append(p)
             betas.append(beta)
-            nts.append(nt)
-            sids.append(sid)
+            nts.append(nt.encode('utf8'))
+            sids.append(sid.encode('utf8'))
             positions.append(pos)
             log_odds.append(lo)
-            infos.append(info)
+            infos.append(info.encode('utf8'))
             freqs.append(frq)
         print(('Still %d SNPs on chromosome %s' % (len(ps), chrom)))
         g = ssg.create_group('chrom_%s' % chrom)
@@ -362,6 +365,7 @@ def parse_sum_stats_standard(filename=None,
         g.create_dataset('betas', data=betas)
         g.create_dataset('log_odds', data=log_odds)
         num_snps += len(log_odds)
+        print(type(infos[1]))
         g.create_dataset('infos', data=infos)
         g.create_dataset('nts', data=nts)
         g.create_dataset('sids', data=sids)
@@ -1128,9 +1132,9 @@ def coordinate_genot_ss(genotype_file=None,
     if plinkf_dict['has_phenotype']:
         hdf5_file.create_dataset('y', data=plinkf_dict['phenotypes'])
 
-    hdf5_file.create_dataset('fids', data=plinkf_dict['fids'])
-    hdf5_file.create_dataset('iids', data=plinkf_dict['iids'])
-    ssf = hdf5_file['sum_stats']
+    hdf5_file.create_dataset('fids', data=plinkf_dict['fids'], dtype="S10")
+    hdf5_file.create_dataset('iids', data=plinkf_dict['iids'], dtype="S10")
+    ssf = hdf5_file['sum_stats'] # .decode()
     cord_data_g = hdf5_file.create_group('cord_data')
 
     # Figure out chromosomes and positions by looking at SNPs.
@@ -1198,12 +1202,11 @@ def coordinate_genot_ss(genotype_file=None,
             ss_freqs = ssg['freqs'][...]
 
         ok_indices = {'g':[], 'ss':[]}
-        for g_i, ss_i in it.izip(g_indices, ss_indices):
+        for g_i, ss_i in zip(g_indices, ss_indices):
 
             # Is the nucleotide ambiguous?
             # g_nt = [recode_dict[g_nts[g_i][0]],recode_dict[g_nts[g_i][1]]
             g_nt = [g_nts[g_i][0], g_nts[g_i][1]]
-
             if not skip_coordination:
                 if tuple(g_nt) in ambig_nts:
                     num_ambig_nts += 1
@@ -1216,7 +1219,7 @@ def coordinate_genot_ss(genotype_file=None,
                     continue
 
                 ss_nt = ss_nts[ss_i]
-
+                # print([g_nt, ss_nt])
                 # Are the nucleotides the same?
                 flip_nts = False
                 os_g_nt = sp.array([opp_strand_dict[g_nt[0]], opp_strand_dict[g_nt[1]]])
@@ -1240,7 +1243,7 @@ def coordinate_genot_ss(genotype_file=None,
             ok_indices['g'].append(g_i)
             ok_indices['ss'].append(ss_i)
             ok_nts.append(g_nt)
-
+        print(ok_indices)
         print(('%d SNPs were excluded due to ambiguous nucleotides.' % num_ambig_nts))
         print(('%d SNPs were excluded due to non-matching nucleotides.' % num_non_matching_nts))
 
@@ -1254,6 +1257,7 @@ def coordinate_genot_ss(genotype_file=None,
         # Parse SNPs
         snp_indices = sp.array(chrom_d['snp_indices'])
         snp_indices = snp_indices[ok_indices['g']]  # Pinpoint where the SNPs are in the file.
+        print(genotype_file)
         raw_snps, freqs = plinkfiles.parse_plink_snps(genotype_file, snp_indices)
         print(('raw_snps.shape=', raw_snps.shape))
 
@@ -1414,7 +1418,7 @@ def coordinate_genotypes_ss_w_ld_ref(genotype_file=None,
 
     hdf5_file.create_dataset('fids', data=plinkf_dict['fids'])
     hdf5_file.create_dataset('iids', data=plinkf_dict['iids'])
-    ssf = hdf5_file['sum_stats']
+    ssf = read_decode_hdf5(hdf5_file['sum_stats'])
     cord_data_g = hdf5_file.create_group('cord_data')
 
     maf_adj_risk_scores = sp.zeros(plinkf_dict['num_individs'])
@@ -1516,7 +1520,7 @@ def coordinate_genotypes_ss_w_ld_ref(genotype_file=None,
 
         # Identifying which SNPs have nucleotides that are ok..
         ok_nts = []
-        for g_i, rg_i, ss_i in it.izip(g_snp_map, rg_snp_map, ss_snp_map):
+        for g_i, rg_i, ss_i in zip(g_snp_map, rg_snp_map, ss_snp_map):
 
             # To make sure, is the SNP id the same?
             assert g_sids[g_i] == rg_sids[rg_i] == ss_sids[ss_i], 'Some issues with coordinating the genotypes.'
