@@ -1243,7 +1243,7 @@ def coordinate_genot_ss(genotype_file=None,
             ok_indices['g'].append(g_i)
             ok_indices['ss'].append(ss_i)
             ok_nts.append(g_nt)
-        print(ok_indices)
+        # print(ok_indices)
         print(('%d SNPs were excluded due to ambiguous nucleotides.' % num_ambig_nts))
         print(('%d SNPs were excluded due to non-matching nucleotides.' % num_non_matching_nts))
 
@@ -1257,7 +1257,6 @@ def coordinate_genot_ss(genotype_file=None,
         # Parse SNPs
         snp_indices = sp.array(chrom_d['snp_indices'])
         snp_indices = snp_indices[ok_indices['g']]  # Pinpoint where the SNPs are in the file.
-        print(genotype_file)
         raw_snps, freqs = plinkfiles.parse_plink_snps(genotype_file, snp_indices)
         print(('raw_snps.shape=', raw_snps.shape))
 
@@ -1759,9 +1758,9 @@ def main():
         bimfile = p_dict['gf'] + '.bim'
     else:
         print('Set of validation SNPs is missing!  Please specify either a validation PLINK genotype file, or a PLINK BIM file with the SNPs of interest.')
-    if os.path.isfile(p_dict['out']):
-        print(('Output file (%s) already exists!  Delete, rename it, or use a different output file.' % (p_dict['out'])))
-        raise Exception('Output file already exists!')
+    # if os.path.isfile(p_dict['out']):
+    #     print(('Output file (%s) already exists!  Delete, rename it, or use a different output file.' % (p_dict['out'])))
+    #     raise Exception('Output file already exists!')
 
     h5f = h5py.File(p_dict['out'], 'w')
     if p_dict['ssf_format'] == 'STANDARD':
