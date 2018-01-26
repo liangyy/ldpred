@@ -8,7 +8,7 @@ def read_decode_hdf5(group):
         out[i] = {}
         for j in list(group[i].keys()):
             if j in known:
-                out[i][j] =  [ m.decode('utf-8') for m in group[i][j][...] ]
+                out[i][j] =  np.char.decode(group[i][j][...])
             else:
                 out[i][j] = group[i][j]
     return out

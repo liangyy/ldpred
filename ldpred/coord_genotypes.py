@@ -352,11 +352,11 @@ def parse_sum_stats_standard(filename=None,
                 prev_pos = pos
             ps.append(p)
             betas.append(beta)
-            nts.append(nt.encode('utf8'))
-            sids.append(sid.encode('utf8'))
+            nts.append(nt) # .encode('utf8'))
+            sids.append(sid) # .encode('utf8'))
             positions.append(pos)
             log_odds.append(lo)
-            infos.append(info.encode('utf8'))
+            infos.append(info) # .encode('utf8'))
             freqs.append(frq)
         print(('Still %d SNPs on chromosome %s' % (len(ps), chrom)))
         g = ssg.create_group('chrom_%s' % chrom)
@@ -366,9 +366,9 @@ def parse_sum_stats_standard(filename=None,
         g.create_dataset('log_odds', data=log_odds)
         num_snps += len(log_odds)
         print(type(infos[1]))
-        g.create_dataset('infos', data=infos)
-        g.create_dataset('nts', data=nts)
-        g.create_dataset('sids', data=sids)
+        g.create_dataset('infos', data=np.array(infos).astype('|S9'))
+        g.create_dataset('nts', data=np.array(nts).astype('|S9'))
+        g.create_dataset('sids', data=np.array(sids).astype('|S9'))
         g.create_dataset('positions', data=positions)
         hdf5_file.flush()
     print(('%d SNPs parsed from summary statistics file.' % num_snps))
@@ -1065,7 +1065,7 @@ def coordinate_decode_genot_ss(genotype_file=None,
 
     hdf5_file.create_dataset('fids', data=pns)
     hdf5_file.create_dataset('iids', data=pns)
-    ssf = hdf5_file['sum_stats']
+    ssf = python3_patch.read_decode_hdf5(hdf5_file['sum_stats'])
     cord_data_g = hdf5_file.create_group('cord_data')
 
     # Figure out chromosomes and positions by looking at SNPs.
@@ -1132,9 +1132,9 @@ def coordinate_genot_ss(genotype_file=None,
     if plinkf_dict['has_phenotype']:
         hdf5_file.create_dataset('y', data=plinkf_dict['phenotypes'])
 
-    hdf5_file.create_dataset('fids', data=plinkf_dict['fids'], dtype="S10")
-    hdf5_file.create_dataset('iids', data=plinkf_dict['iids'], dtype="S10")
-    ssf = hdf5_file['sum_stats'] # .decode()
+    hdf5_file.create_dataset('fids', data=np.array(plinkf_dict['fids']).astype('|S9'))
+    hdf5_file.create_dataset('iids', data=np.array(plinkf_dict['iids']).astype('|S9'))
+    ssf = python3_patch.read_decode_hdf5(hdf5_file['sum_stats']) # .decode()
     cord_data_g = hdf5_file.create_group('cord_data')
 
     # Figure out chromosomes and positions by looking at SNPs.
@@ -1418,7 +1418,7 @@ def coordinate_genotypes_ss_w_ld_ref(genotype_file=None,
 
     hdf5_file.create_dataset('fids', data=plinkf_dict['fids'])
     hdf5_file.create_dataset('iids', data=plinkf_dict['iids'])
-    ssf = read_decode_hdf5(hdf5_file['sum_stats'])
+    ssf = python3_patch.read_decode_hdf5(hdf5_file['sum_stats'])
     cord_data_g = hdf5_file.create_group('cord_data')
 
     maf_adj_risk_scores = sp.zeros(plinkf_dict['num_individs'])
