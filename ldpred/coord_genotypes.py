@@ -1349,8 +1349,8 @@ def coordinate_genot_ss(genotype_file=None,
         ofg.create_dataset('freqs_ref', data=freqs)
         ofg.create_dataset('ps', data=ps)
         ofg.create_dataset('positions', data=positions)
-        ofg.create_dataset('nts', data=nts)
-        ofg.create_dataset('sids', data=sids)
+        ofg.create_dataset('nts', data=np.array(nts).astype('|S9'))
+        ofg.create_dataset('sids', data=np.array(sids).astype('|S9'))
         if genetic_map_dir is not None:
             ofg.create_dataset('genetic_map', data=genetic_map)
 #         print 'Sum of squared effect sizes:', sp.sum(betas ** 2)
