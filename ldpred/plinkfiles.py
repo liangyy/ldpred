@@ -35,7 +35,7 @@ def parse_plink_snps(genotype_file, snp_indices):
     raw_snps = sp.empty((num_snps, num_individs), dtype='int8')
     # If these indices are not in order then we place them in the right place while parsing SNPs.
     snp_order = sp.argsort(snp_indices)
-    print(snp_indices)
+    # print(snp_indices)
     ordered_snp_indices = list(snp_indices[snp_order])
     ordered_snp_indices.reverse()
     print('Iterating over file to load SNPs')

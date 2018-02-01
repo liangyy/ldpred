@@ -70,6 +70,7 @@ import plinkfiles
 ## Newly added
 import numpy as np
 import python3_patch
+import re
 
 ambig_nts = set([('A', 'T'), ('T', 'A'), ('G', 'C'), ('C', 'G')])
 # recode_dict = {'1':'A', '2':'C', '3':'G', '4':'T'}
@@ -296,7 +297,7 @@ def parse_sum_stats_standard(filename=None,
         bad_chromosomes = set()
         for line in f:
             l = (line.strip()).split()
-            chrom = l[0][3:]
+            chrom = re.sub('chr', '', l[0])
             if not chrom in ok_chromosomes:
                 bad_chromosomes.add(chrom)
                 continue
@@ -368,7 +369,7 @@ def parse_sum_stats_standard(filename=None,
         print(type(infos[1]))
         g.create_dataset('infos', data=np.array(infos).astype('|S9'))
         g.create_dataset('nts', data=np.array(nts).astype('|S9'))
-        g.create_dataset('sids', data=np.array(sids).astype('|S9'))
+        g.create_dataset('sids', data=np.array(sids).astype('|S15'))
         g.create_dataset('positions', data=positions)
         hdf5_file.flush()
     print(('%d SNPs parsed from summary statistics file.' % num_snps))
@@ -638,7 +639,7 @@ def parse_sum_stats_decode(filename=None,
             l = (line.strip()).split()
             sid = l[14]
             pos = l[11]
-            chrom = l[10][3:]
+            chrom = re.sub('chr', '', l[10])
             if not chrom in ok_chromosomes:
                 bad_chromosomes.add(chrom)
                 continue
@@ -864,7 +865,7 @@ def parse_sum_stats_pgc_small(filename=None,
         for line in f:
             l = (line.strip()).split()
             chrom_str = l[0]
-            chrom = chrom_str[3:]
+            chrom = re.sub('chr', '', chrom_str)
             if not chrom in ok_chromosomes:
                 bad_chromosomes.add(chrom)
                 continue
@@ -971,7 +972,7 @@ def parse_sum_stats_basic(filename=None,
         for line in f:
             l = (line.strip()).split()
             chrom_str = l[0]
-            chrom = chrom_str[3:]
+            chrom = re.sub('chr', '', chrom_str)
             if not chrom in ok_chromosomes:
                 bad_chromosomes.add(chrom)
                 continue
@@ -1165,6 +1166,7 @@ def coordinate_genot_ss(genotype_file=None,
         assert len(g_sid_set) == len(g_sids), 'Some duplicates?'
         ss_sids = ssg['sids'][...]
         ss_sid_set = set(ss_sids)
+        # print(ssg['sids'])
         assert len(ss_sid_set) == len(ss_sids), 'Some duplicates?'
 
         # Figure out filters:
@@ -1190,6 +1192,7 @@ def coordinate_genot_ss(genotype_file=None,
         ss_nts = ssg['nts'][...]
         betas = ssg['betas'][...]
         log_odds = ssg['log_odds'][...]
+        print(len(betas))
         assert not sp.any(sp.isnan(betas)), 'WTF?'
         assert not sp.any(sp.isinf(betas)), 'WTF?'
 
@@ -1349,7 +1352,7 @@ def coordinate_genot_ss(genotype_file=None,
         ofg.create_dataset('ps', data=ps)
         ofg.create_dataset('positions', data=positions)
         ofg.create_dataset('nts', data=np.array(nts).astype('|S9'))
-        ofg.create_dataset('sids', data=np.array(sids).astype('|S9'))
+        ofg.create_dataset('sids', data=np.array(sids).astype('|S15'))
         if genetic_map_dir is not None:
             ofg.create_dataset('genetic_map', data=genetic_map)
 #         print 'Sum of squared effect sizes:', sp.sum(betas ** 2)
