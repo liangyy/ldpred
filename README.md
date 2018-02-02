@@ -10,3 +10,7 @@ ython ldpred/coord_genotypes.py --gf test_data/LDpred_cc_data_p0.001_train_0 --s
 # LDpred.py
 $ python ldpred/LDpred.py --coord=test_data/LDpred_cc_data_p0.001_coord.hdf5 --N=10000 --out=test_data/LDpred_cc_data_p0.001_ldpred --ld_radius=3
 ```
+
+# Changes
+
+`ldpred/coord_genotype.py` reads in standard summary statistic file and calculate p-value with sample size specified in the file (last column) if it is provided.
