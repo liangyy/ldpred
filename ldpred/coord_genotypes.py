@@ -317,10 +317,14 @@ def parse_sum_stats_standard(filename=None,
                 nt = [l[2], l[3]]
                 chrom_dict[chrom]['nts'].append(nt)
                 raw_beta = -float(l[8])
+                if len(l) == 10:
+                    n_now = float(l[9])
+                else:
+                    n_now = n
                 chrom_dict[chrom]['log_odds'].append(raw_beta)
                 beta = sp.sign(raw_beta) * stats.norm.ppf(pval / 2.0)
 
-                chrom_dict[chrom]['betas'].append(beta / sp.sqrt(n))
+                chrom_dict[chrom]['betas'].append(beta / sp.sqrt(n_now))
 
         if len(bad_chromosomes) > 0:
             print(('Ignored chromosomes:', ','.join(list(bad_chromosomes))))
