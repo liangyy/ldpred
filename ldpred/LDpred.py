@@ -203,7 +203,7 @@ def ldpred_genomewide(data_file=None, ld_radius=None, ld_dict=None, out_file_pre
     print('Genome-wide mean LD score:', L)
     gw_h2_ld_score_est = max(0.0001, (max(1, chi_square_lambda) - 1) / (n * (L / num_snps)))
     print('Estimated genome-wide heritability:', gw_h2_ld_score_est)
-
+    print(chi_square_lambda)
     assert chi_square_lambda > 1, 'Something is wrong with the GWAS summary statistics.  Perhaps there were issues parsing of them, or the given GWAS sample size (N) was too small. Either way, lambda (the mean Chi-square statistic) is too small.  '
 
     LDpred_inf_chrom_dict = {}

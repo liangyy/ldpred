@@ -1192,7 +1192,8 @@ def coordinate_genot_ss(genotype_file=None,
         ss_nts = ssg['nts'][...]
         betas = ssg['betas'][...]
         log_odds = ssg['log_odds'][...]
-        print(len(betas))
+        print(betas)
+        print(ssg['sids'][...])
         assert not sp.any(sp.isnan(betas)), 'WTF?'
         assert not sp.any(sp.isinf(betas)), 'WTF?'
 
