@@ -282,7 +282,8 @@ def parse_phen_file(pf, pf_format):
                     sex = int(l[4])
                     phen = float(l[5])
                     # print(l)
-                    if sex != 0 and phen != -9:
+                    # if sex != 0 and phen != -9:
+                    if phen != -9:
                         phen_map[iid] = {'phen':phen, 'sex':sex}
 
             iids = set(phen_map.keys())
