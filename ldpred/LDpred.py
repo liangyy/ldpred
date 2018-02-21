@@ -199,6 +199,7 @@ def ldpred_genomewide(data_file=None, ld_radius=None, ld_dict=None, out_file_pre
 
     L = ld_scores_dict['avg_gw_ld_score']
     chi_square_lambda = sp.mean(n * sum_beta2s / float(num_snps))
+    print(num_snps)
     print('Genome-wide lambda inflation:', chi_square_lambda, end=' ')
     print('Genome-wide mean LD score:', L)
     gw_h2_ld_score_est = max(0.0001, (max(1, chi_square_lambda) - 1) / (n * (L / num_snps)))
@@ -512,6 +513,7 @@ If they are a subset of the validation data set, then we suggest recalculate LDp
         print('Calculating LD information w. radius %d' % p_dict['ld_radius'])
 
         cord_data_g = python3_patch.read_decode_hdf5(df['cord_data'])
+        # print(list(cord_data_g.keys()))
         for chrom_str in list(cord_data_g.keys()):
             print('Working on %s' % chrom_str)
             g = cord_data_g[chrom_str]
@@ -523,6 +525,8 @@ If they are a subset of the validation data set, then we suggest recalculate LDp
 
             # Filter monomorphic SNPs
             ok_snps_filter = snp_stds > 0
+            # print('-------')
+            # print(ok_snps_filter)
             ok_snps_filter = ok_snps_filter.flatten()
             raw_snps = raw_snps[ok_snps_filter]
             snp_means = snp_means[ok_snps_filter]
@@ -549,6 +553,7 @@ If they are a subset of the validation data set, then we suggest recalculate LDp
             chrom_ld_scores_dict[chrom_str] = {'ld_scores':ld_scores, 'avg_ld_score':sp.mean(ld_scores)}
             ld_score_sum += sp.sum(ld_scores)
             num_snps += n_snps
+        print(num_snps)
         avg_gw_ld_score = ld_score_sum / float(num_snps)
         ld_scores_dict = {'avg_gw_ld_score': avg_gw_ld_score, 'chrom_dict':chrom_ld_scores_dict}
 
