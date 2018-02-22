@@ -54,7 +54,17 @@ def parse_plink_snps(genotype_file, snp_indices):
                 mode_v = sp.argmax(bin_counts[:2])
                 snp[snp == 3] = mode_v
             s_i = snp_order[snp_i]
-            raw_snps[s_i] = snp
+
+
+            ## fixed buggy code
+            ## wrong encoding of genotype (A1 should be encoded as 1 instead of A2. It is different from plinkio default)
+            ## original code:
+            # raw_snps[s_i] = snp
+            ## new code
+            raw_snps[s_i] = 2 - snp
+            ## fix finish
+
+
             if line_i < max_i:
                 next_i = ordered_snp_indices.pop()
             snp_i += 1

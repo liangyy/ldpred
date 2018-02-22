@@ -209,6 +209,15 @@ def get_prs(genotype_file, rs_id_map, phen_map=None):
             mode_v = sp.argmax(bin_counts[:2])
             snp[snp == 3] = mode_v
 
+        ## fixed buggy code
+        ## wrong encoding of genotype (A1 should be encoded as 1 instead of A2. It is different from plinkio default)
+        ## original code:
+        # no action
+        ## new code
+        snp = 2 - snp
+        ## fix finish
+
+
         # Normalize SNP
 #         n_snp = (snp - sp.mean(snp))/sp.std(snp)
 
