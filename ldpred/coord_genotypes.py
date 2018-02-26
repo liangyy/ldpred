@@ -370,7 +370,7 @@ def parse_sum_stats_standard(filename=None,
         g.create_dataset('betas', data=betas)
         g.create_dataset('log_odds', data=log_odds)
         num_snps += len(log_odds)
-        print(type(infos[1]))
+        # print(type(infos[0]))
         g.create_dataset('infos', data=np.array(infos).astype('|S9'))
         g.create_dataset('nts', data=np.array(nts).astype('|S9'))
         g.create_dataset('sids', data=np.array(sids).astype('|S15'))
